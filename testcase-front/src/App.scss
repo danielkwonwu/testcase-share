@@ -1,0 +1,39 @@
+
+$wustlred : #a51417;
+$wustlgrey1 : #6c7373;
+$wustlgrey2 : #c8c8c8;
+$wustlgreen : #007360;
+
+
+body{
+  font-family: Arial, Helvetica, sans-serif;
+}
+button{
+  background-color: $wustlred;
+  color: $wustlgrey2;
+  border-color: $wustlgrey1;
+}
+#button{
+  background-color: $wustlred;
+  color: $wustlgrey2;
+  border-color: $wustlgrey1;
+}
+.user-nav{
+  background-color: $wustlgrey2;
+  font-weight: bold;
+  vertical-align: middle;
+}
+.user-form{
+  vertical-align : middle;
+  color: $wustlred;
+}
+.testcase-form{
+  color : $wustlred;
+}
+.logo{
+  display: inline-block;
+}
+.page-wrapper{
+  margin: auto;
+  width: 80%;
+}
