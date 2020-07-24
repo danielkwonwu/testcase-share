@@ -1,7 +1,7 @@
 # testcase-share
 Unit test sharing website with social features to aid computer science education in the COVID-19 era.
 
-# install
+# installation
 You will need Node.jsinstalled to run the app.
 
 Install Node.js at https://nodejs.org/en/download/.
