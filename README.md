@@ -4,7 +4,7 @@ Unit test sharing website with social features to aid computer science education
 # install
 You will need Node.jsinstalled to run the app.
 Install Node.js at https://nodejs.org/en/download/
-Then, run ./install.sh 
+Then, run bash install.sh 
 
 # booting app
 Backend:
