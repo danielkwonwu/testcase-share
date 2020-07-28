@@ -95,6 +95,7 @@ router.post('/login', function (req, res, next) {
 });
 
 router.get("/auth", (req, res) => {
+    console.log("session status : " + req.session.authenticated);
     if (req.session.authenticated == true) {
         res.json({
             success: true,

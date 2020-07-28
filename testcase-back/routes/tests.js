@@ -10,14 +10,25 @@ router.post("/testcase", (req, res) => {
             console.log(err);
             throw err;
         }
-        res.json({
-            success:true
-        })
+        fs.readFile('./testcase.txt', 'utf8', (err, data) => {
+            if (err){
+                res.json({
+                    success: false,
+                    fetchedTest: ""
+                });
+                return;
+            }
+            console.log(data);
+            res.json({
+                success: true,
+                fetchedTest: data
+            });
+            console.log("sent");
+        });
     });
 });
 
 router.get("/fetch", (req, res) => {
-
     fs.readFile('./testcase.txt', 'utf8', (err, data) => {
         if (err){
             return console.log(err);

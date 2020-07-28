@@ -64,16 +64,13 @@ class TestCase extends React.Component {
       fetchedTest: "",
       success: false
     }
-
     this.requestPost = this.requestPost.bind(this);
     this.changeText = this.changeText.bind(this);
     this.refreshTest = this.refreshTest.bind(this);
   }
-
   changeText(event) {
     this.setState({ testCaseText: event.target.value });
   }
-
   componentDidMount(){
     fetch("http://localhost:3001/tests/fetch", {
       credentials: 'include',
@@ -109,8 +106,15 @@ class TestCase extends React.Component {
     })
       .then(res => res.json())
       .then(data => {
-        console.log(data);
-      }).then(this.refreshTest());
+        if (data.success){
+          this.setState({
+            fetchedTest : data.fetchedTest
+          });
+        }
+        else{
+          console.log("error occured while updating");
+        }
+      });
     console.log("JSON SENT " + JSON.stringify(body));
     event.preventDefault();
   };
@@ -130,6 +134,9 @@ class TestCase extends React.Component {
             fetchedTest : data.fetchedTest
           });
           console.log("fetchData Success " + data.fetchedTest);
+        }
+        else{
+          console.log("error occured while updating");
         }
       })
       .catch(error => console.error(error));
@@ -152,7 +159,7 @@ class TestCase extends React.Component {
         }
       </div>
     );
-  }
+  } 
 }
 
 class App extends React.Component {
