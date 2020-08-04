@@ -10,8 +10,27 @@ Then, run bash install.sh.
 
 If the bash script fails to run, install dos2unix by running "sudo apt-get install -y dos2unix"
 
-
 Then, run "dos2unix install.sh" to convert the script into Unix.
+
+# database setup
+
+create user and database through following commands
+
+CREATE DATABASE testcasegen;
+
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'qwerty';
+
+GRANT ALL PRIVILEGES ON testcasegen.* TO 'admin'@'localhost';
+
+USE testcasegen;
+
+CREATE TABLE users (
+id mediumint unsigned not null auto_increment,
+username varchar(30) not null,
+password varchar(60) not null,
+primary key (id)
+)engine = InnoDB;
+
 
 # booting app
 Backend:
