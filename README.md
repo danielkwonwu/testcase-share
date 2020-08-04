@@ -20,6 +20,8 @@ CREATE DATABASE testcasegen;
 
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'qwerty';
 
+ALTER USER 'admin'@'localhost' IDENTIFIED WITH mysql_native_password BY 'qwerty'; // to use with javascript connector.
+
 GRANT ALL PRIVILEGES ON testcasegen.* TO 'admin'@'localhost';
 
 USE testcasegen;
