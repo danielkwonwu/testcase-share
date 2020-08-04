@@ -33,6 +33,14 @@ password varchar(60) not null,
 primary key (id)
 )engine = InnoDB;
 
+CREATE TABLE testcases (
+id mediumint unsigned not null auto_increment,
+ownerid mediumint unsigned not null,
+content varchar(200) not null,
+primary key (id)
+)engine = InnoDB;
+
+ALTER TABLE testcases add foreign key (ownerid) references users (id);
 
 # booting app
 Backend:
