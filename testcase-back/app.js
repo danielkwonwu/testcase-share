@@ -21,7 +21,7 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
     cookie: {
-        secure: true,
+        secure: false, // for dev purposes, this is false. However, for full build, we need to have this secure flag as true and have communications on https.
         sameSite: 'none'
     }
 }));

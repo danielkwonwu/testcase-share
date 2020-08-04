@@ -6,6 +6,8 @@ var connection = mysql.createConnection({
     password: 'qwerty',
     database: 'testcasegen'
 })
+
+
   
 connection.connect()
 
