@@ -36,6 +36,7 @@ primary key (id)
 CREATE TABLE testcases (
 id mediumint unsigned not null auto_increment,
 ownerid mediumint unsigned not null,
+ownername varchar(30) not null,
 content varchar(200) not null,
 primary key (id)
 )engine = InnoDB;
