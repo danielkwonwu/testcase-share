@@ -14,7 +14,7 @@ Then, run "dos2unix install.sh" to convert the script into Unix.
 
 # database setup
 
-create user and database through following commands
+create user and database through following MySQL queries.
 
 CREATE DATABASE testcasegen;
 
