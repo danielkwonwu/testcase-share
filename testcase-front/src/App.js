@@ -55,18 +55,38 @@ class LoginBar extends React.Component {
   }
 }
 
-
 class TestCase extends React.Component {
-  constructor(props) {
+  constructor(props){
     super(props);
     this.state = {
+      id: this.props.id,
+      ownerid: this.props.ownerid,
+      ownername: this.props.ownername,
+      content: this.props.content,
+      toggle : false
+    }
+  }
+  render(){
+    return (
+      <div>
+        {this.state.content}
+      </div>
+    );
+  }
+}
+
+
+class TestCases extends React.Component {
+  constructor(props) {
+    super(props);
+    
+    this.state = {
       testCaseText: "",
-      fetchedTest: "",
+      fetchedTest: [],
       success: false
     }
     this.requestPost = this.requestPost.bind(this);
     this.changeText = this.changeText.bind(this);
-    this.refreshTest = this.refreshTest.bind(this);
   }
   changeText(event) {
     this.setState({ testCaseText: event.target.value });
@@ -94,7 +114,8 @@ class TestCase extends React.Component {
   requestPost(event) {
     alert('Submitted: ' + this.state.testCaseText);
     let body = {
-      text: this.state.testCaseText
+      text: this.state.testCaseText,
+      owner: this.props.username
     }
     fetch('http://localhost:3001/tests/testcase', {
       credentials: 'include',
@@ -107,6 +128,7 @@ class TestCase extends React.Component {
       .then(res => res.json())
       .then(data => {
         if (data.success){
+          console.log(data.fetchedTest);
           this.setState({
             fetchedTest : data.fetchedTest
           });
@@ -119,33 +141,15 @@ class TestCase extends React.Component {
     event.preventDefault();
   };
 
-  refreshTest(){
-    fetch("http://localhost:3001/tests/fetch", {
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: "GET",
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          this.setState({
-            fetchedTest : data.fetchedTest
-          });
-          console.log("fetchData Success " + data.fetchedTest);
-        }
-        else{
-          console.log("error occured while updating");
-        }
-      })
-      .catch(error => console.error(error));
-  }
-
   render() {
+    var items = [];
+    for (var i = 0; i < this.state.fetchedTest.length; i++){
+      var each = this.state.fetchedTest[i];
+      items.push((<TestCase key = {i} ownername={each.ownername} content = {each.content}></TestCase>));
+    }
     return (
       <div>
-        <p>{this.state.fetchedTest}</p>
+        {items}
         {!this.props.authenticated ?
           <p>You need to be logged in to submit test cases.</p>
           :
@@ -287,7 +291,7 @@ class App extends React.Component {
       <div className="page-wrapper">
         <LoginBar authenticated={this.state.authenticated} error={this.state.loginError} username={this.state.username} logout={this.logout} login={this.login} register={this.register} ></LoginBar>
         <h1>TestCase Generator</h1>
-        <TestCase authenticated={this.state.authenticated} ></TestCase>
+        <TestCases authenticated={this.state.authenticated} username={this.state.username} ></TestCases>
       </div>
     )
   }
