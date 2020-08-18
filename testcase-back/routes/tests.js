@@ -37,27 +37,6 @@ router.post("/testcase", (req, res) => {
             }
         });
     }
-    /*fs.appendFile('./testcase.txt', "\n" + req.body.text, (err) => {
-        if (err) {
-            console.log(err);
-            throw err;
-        }
-        fs.readFile('./testcase.txt', 'utf8', (err, data) => {
-            if (err){
-                res.json({
-                    success: false,
-                    fetchedTest: ""
-                });
-                return;
-            }
-            console.log(data);
-            res.json({
-                success: true,
-                fetchedTest: data
-            });
-            console.log("sent");
-        });
-    });*/
 });
 
 router.get("/fetch", (req, res) => {
@@ -70,18 +49,11 @@ router.get("/fetch", (req, res) => {
             fetchedTest: results
         })
     });
-    /*fs.readFile('./testcase.txt', 'utf8', (err, data) => {
-        if (err){
-            return console.log(err);
-        }
-        console.log(data);
-        res.json({
-            success: true,
-            fetchedTest: data
-        });
-        console.log("sent");
-    })*/
 });
+
+router.get("/delete", (req, res) =>{
+    connection.query()
+})
 
 
 module.exports = router;

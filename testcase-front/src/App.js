@@ -56,20 +56,66 @@ class LoginBar extends React.Component {
 }
 
 class TestCase extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       id: this.props.id,
       ownerid: this.props.ownerid,
       ownername: this.props.ownername,
       content: this.props.content,
-      toggle : false
+      toggle: false
     }
+    this.toggleChange = this.toggleChange.bind(this);
+    this.deleteTestCase = this.deleteTestCase(this);
   }
-  render(){
+
+  toggleChange() {
+    var tog = this.state.toggle;
+    this.setState({
+      toggle: !tog
+    });
+  };
+
+  deleteTestCase(){
+    fetch("http://localhost:3001/tests/delete", {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: this.props.id
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success){
+        console.log("sucess deleting");
+      }
+      else{
+        console.log("error while deleting");
+      }
+    })
+  }
+
+  render() {
     return (
       <div>
-        {this.state.content}
+        {!this.state.toggle ?
+          <button type="button" className="testcase" onClick={this.toggleChange}>
+            {this.state.content}
+          </button>
+          :
+          <div>
+            <button type="button" className = "testcase" onClick={this.toggleChange}>
+              {this.state.content}
+            </button>
+            <div className = "testcase-detail">
+              Submitted by {this.state.ownername}.
+              {this.props.currentUser === this.state.ownername ?
+              <p>yes</p>
+              : <p>nope</p>}
+            </div>
+          </div>
+        }
       </div>
     );
   }
@@ -79,7 +125,7 @@ class TestCase extends React.Component {
 class TestCases extends React.Component {
   constructor(props) {
     super(props);
-    
+
     this.state = {
       testCaseText: "",
       fetchedTest: [],
@@ -87,11 +133,16 @@ class TestCases extends React.Component {
     }
     this.requestPost = this.requestPost.bind(this);
     this.changeText = this.changeText.bind(this);
+    this.refreshTestCases = this.refreshTestCases.bind(this);
   }
   changeText(event) {
     this.setState({ testCaseText: event.target.value });
   }
-  componentDidMount(){
+  componentDidMount() {
+    this.refreshTestCases();
+  }
+
+  refreshTestCases(){
     fetch("http://localhost:3001/tests/fetch", {
       credentials: 'include',
       headers: {
@@ -103,7 +154,7 @@ class TestCases extends React.Component {
       .then(data => {
         if (data.success) {
           this.setState({
-            fetchedTest : data.fetchedTest
+            fetchedTest: data.fetchedTest
           });
           console.log("fetchData Success " + data.fetchedTest);
         }
@@ -127,13 +178,13 @@ class TestCases extends React.Component {
     })
       .then(res => res.json())
       .then(data => {
-        if (data.success){
+        if (data.success) {
           console.log(data.fetchedTest);
           this.setState({
-            fetchedTest : data.fetchedTest
+            fetchedTest: data.fetchedTest
           });
         }
-        else{
+        else {
           console.log("error occured while updating");
         }
       });
@@ -143,9 +194,9 @@ class TestCases extends React.Component {
 
   render() {
     var items = [];
-    for (var i = 0; i < this.state.fetchedTest.length; i++){
+    for (var i = 0; i < this.state.fetchedTest.length; i++) {
       var each = this.state.fetchedTest[i];
-      items.push((<TestCase key = {i} ownername={each.ownername} content = {each.content}></TestCase>));
+      items.push((<TestCase currentUser= {this.props.username} key={i} id={each.id} ownername={each.ownername} content={each.content}></TestCase>));
     }
     return (
       <div>
@@ -163,7 +214,7 @@ class TestCases extends React.Component {
         }
       </div>
     );
-  } 
+  }
 }
 
 class App extends React.Component {

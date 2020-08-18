@@ -37,3 +37,23 @@ button{
   margin: auto;
   width: 80%;
 }
+
+.testcase{
+  outline: none;
+  font-size: 20px;
+  border: none;
+  width: 80%;
+  background-color: $wustlgrey2;
+  color: black;
+  text-align: left;
+}
+
+.testcase-detail{
+  outline: none;
+  font-size: 20px;
+  border: none;
+  width: 80%;
+  background-color: white;
+  color: black;
+  text-align: left;
+}
