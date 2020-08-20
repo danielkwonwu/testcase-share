@@ -55,7 +55,44 @@ class LoginBar extends React.Component {
   }
 }
 
-class TestCase extends React.Component {
+class View extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      mode : 'testcases',
+      id: null
+    }
+    this.switchView = this.switchView.bind(this);
+    this.getView = this.getView.bind(this);
+  }
+
+  switchView(mode, id){
+    switch(mode){
+      case 'testcases':
+        this.setState({
+          mode : mode
+        });
+        break;
+      case 'single':
+        this.setState({
+          mode : mode,
+          id : id
+        })
+        break;
+    }
+  }
+  
+  getView(){
+    switch(this.state.mode){
+      case 'testcases':
+        return <TestCases authenticated={this.state.authenticated} username={this.state.username}></TestCases>;
+      case 'single':
+        return <SingleView></SingleView>
+    }
+  }
+}
+
+class SingleView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -66,83 +103,96 @@ class TestCase extends React.Component {
       toggle: false
     }
     this.toggleChange = this.toggleChange.bind(this);
-    this.deleteTestCase = this.deleteTestCase(this);
+    this.deleteTestCase = this.deleteTestCase.bind(this);
   }
 
   toggleChange() {
+    console.log("toggle fired");
     var tog = this.state.toggle;
     this.setState({
       toggle: !tog
     });
   };
 
-  deleteTestCase(){
+  deleteTestCase(event) {
+    console.log("delete fired : " + this.state.id);
+    let body = {
+      id: this.state.id
+    }
     fetch("http://localhost:3001/tests/delete", {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
       method: "POST",
-      body: this.props.id
+      body: JSON.stringify(body)
     })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success){
-        console.log("sucess deleting");
-      }
-      else{
-        console.log("error while deleting");
-      }
-    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          console.log("sucess deleting");
+          this.props.refresh();
+        }
+        else {
+          console.log("error while deleting");
+        }
+      })
   }
 
   render() {
     return (
       <div>
-        {!this.state.toggle ?
+        {this.state.deleted ?
+        <div>
+        </div>
+        :
+        <div>{!this.state.toggle ?
           <button type="button" className="testcase" onClick={this.toggleChange}>
             {this.state.content}
           </button>
           :
           <div>
-            <button type="button" className = "testcase" onClick={this.toggleChange}>
+            <button type="button" className="testcase" onClick={this.toggleChange}>
               {this.state.content}
             </button>
-            <div className = "testcase-detail">
+            <div className="testcase-detail">
               Submitted by {this.state.ownername}.
               {this.props.currentUser === this.state.ownername ?
-              <p>yes</p>
-              : <p>nope</p>}
+                <button onClick={this.deleteTestCase}>Delete TestCase</button>
+                : <p>nope</p>}
             </div>
           </div>
+        }
+        </div>
         }
       </div>
     );
   }
 }
 
-
 class TestCases extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       testCaseText: "",
-      fetchedTest: [],
-      success: false
+      fetchedTest: []
     }
     this.requestPost = this.requestPost.bind(this);
     this.changeText = this.changeText.bind(this);
     this.refreshTestCases = this.refreshTestCases.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.toggle = this.toggle.bind(this);
   }
+
   changeText(event) {
-    this.setState({ testCaseText: event.target.value });
+    this.setState({ testCaseText: event.target.value});
   }
+
   componentDidMount() {
     this.refreshTestCases();
   }
 
-  refreshTestCases(){
+  refreshTestCases() {
     fetch("http://localhost:3001/tests/fetch", {
       credentials: 'include',
       headers: {
@@ -179,7 +229,6 @@ class TestCases extends React.Component {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          console.log(data.fetchedTest);
           this.setState({
             fetchedTest: data.fetchedTest
           });
@@ -188,16 +237,54 @@ class TestCases extends React.Component {
           console.log("error occured while updating");
         }
       });
-    console.log("JSON SENT " + JSON.stringify(body));
     event.preventDefault();
   };
 
-  render() {
-    var items = [];
-    for (var i = 0; i < this.state.fetchedTest.length; i++) {
-      var each = this.state.fetchedTest[i];
-      items.push((<TestCase currentUser= {this.props.username} key={i} id={each.id} ownername={each.ownername} content={each.content}></TestCase>));
+  toggle(obj, key){
+    console.log("clicked " + obj.id + " " + obj.toggle);
+    var flag = obj.toggle;
+    obj.toggle = !flag;
+    document.getElementById(obj.id).text = obj.ownername;
+  }
+
+  handleDelete(id, key){
+    console.log("delete fired : " + id);
+    let body = {
+      id: id
     }
+    fetch("http://localhost:3001/tests/delete", {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify(body)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          console.log("sucess deleting");
+          this.refreshTestCases();
+        }
+        else {
+          console.log("error while deleting");
+        }
+      })
+  }
+
+  render() {
+    const items = this.state.fetchedTest.map(obj =>{
+      obj.toggle = false;
+      return(
+          <div key = {obj.key}>
+            <button type="button" className="testcase" onClick={() => this.toggle(obj, obj.key)}>
+              {obj.content}
+            </button>
+            <div className = "testcase-detail" id = "obj.id"></div>
+          </div>
+      );     
+    });
+
     return (
       <div>
         {items}

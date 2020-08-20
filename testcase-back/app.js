@@ -22,7 +22,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         secure: false, // for dev purposes, this is false. However, for full build, we need to have this secure flag as true and have communications on https.
-        sameSite: 'none'
+        //sameSite: 'none'
     }
 }));
 
@@ -42,9 +42,5 @@ app.use(function (err, req, res, next) {
     });
 });
 
-app.post('/', (req, res) => {
-    console.log(req.body.text);
-    res.send('Hello World!')
-});
 
 module.exports = app;

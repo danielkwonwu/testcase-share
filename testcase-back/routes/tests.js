@@ -20,8 +20,6 @@ router.post("/testcase", (req, res) => {
                 connection.query('INSERT INTO testcases (ownerid,ownername,content) VALUES (?,?,?)', [ownerid, ownername, req.body.text], (err, results) => {
                     if (err) throw err;
                     connection.query('SELECT * from testcases', (err, results) =>{
-                        console.log("select query");
-                        console.log(results);
                         res.json({
                             success: true,
                             fetchedTest: results
@@ -42,18 +40,33 @@ router.post("/testcase", (req, res) => {
 router.get("/fetch", (req, res) => {
     connection.query('SELECT * from testcases', (err, results) =>{
         if (err) throw err;
-        console.log("select query");
-        console.log(results);
-        res.json({
+        var testList = {
             success: true,
-            fetchedTest: results
-        })
+            fetchedTest: Array()
+        };
+        for (var i = 0; i < results.length; i++){
+            testList.fetchedTest.push({
+                id: results[i].id,
+                key : i,
+                content: results[i].content,
+                ownerid: results[i].ownerid,
+                ownername : results[i].ownername
+            })
+        }
+        res.json(testList);
     });
 });
 
-router.get("/delete", (req, res) =>{
-    connection.query()
-})
+router.post("/delete", (req, res) =>{
+    var id = req.body.id;
+    console.log("id received : " + id);
+    connection.query('DELETE FROM testcases WHERE id = ?', [id], (err, results) =>{
+        if (err) throw err;
+        res.json({
+            success: true
+        })
+    });
+});
 
 
 module.exports = router;

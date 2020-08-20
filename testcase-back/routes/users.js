@@ -7,7 +7,6 @@ var router = express.Router();
 router.post('/register', function (req, res, next) {
     var username = req.body.username;
     var password = req.body.password;
-    console.log(username + " : "+ password);
     if (!(username && password)) {
         res.json({
             success: false,
