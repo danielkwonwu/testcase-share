@@ -85,10 +85,14 @@ class View extends React.Component {
   getView(){
     switch(this.state.mode){
       case 'testcases':
-        return <TestCases authenticated={this.state.authenticated} username={this.state.username}></TestCases>;
+        return <TestCasesView switchView={this.switchView} authenticated={this.state.authenticated} username={this.state.username}></TestCasesView>;
       case 'single':
         return <SingleView></SingleView>
     }
+  }
+
+  render(){
+    return(this.getView());
   }
 }
 
@@ -97,9 +101,6 @@ class SingleView extends React.Component {
     super(props);
     this.state = {
       id: this.props.id,
-      ownerid: this.props.ownerid,
-      ownername: this.props.ownername,
-      content: this.props.content,
       toggle: false
     }
     this.toggleChange = this.toggleChange.bind(this);
@@ -170,7 +171,7 @@ class SingleView extends React.Component {
   }
 }
 
-class TestCases extends React.Component {
+class TestCasesView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -277,7 +278,7 @@ class TestCases extends React.Component {
       obj.toggle = false;
       return(
           <div key = {obj.key}>
-            <button type="button" className="testcase" onClick={() => this.toggle(obj, obj.key)}>
+            <button type="button" className="testcase" onClick={() => this.props.switchView('single', obj.id)}>
               {obj.content}
             </button>
             <div className = "testcase-detail" id = "obj.id"></div>
@@ -429,7 +430,7 @@ class App extends React.Component {
       <div className="page-wrapper">
         <LoginBar authenticated={this.state.authenticated} error={this.state.loginError} username={this.state.username} logout={this.logout} login={this.login} register={this.register} ></LoginBar>
         <h1>TestCase Generator</h1>
-        <TestCases authenticated={this.state.authenticated} username={this.state.username} ></TestCases>
+        <View authenticated={this.state.authenticated} username={this.state.username} ></View>
       </div>
     )
   }
