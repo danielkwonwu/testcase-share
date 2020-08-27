@@ -60,6 +60,7 @@ class View extends React.Component {
     super(props);
     this.state = {
       mode : 'testcases',
+      username : this.props.username,
       id: null
     }
     this.switchView = this.switchView.bind(this);
@@ -79,6 +80,8 @@ class View extends React.Component {
           id : id
         })
         break;
+      default:
+        break;
     }
   }
   
@@ -87,7 +90,7 @@ class View extends React.Component {
       case 'testcases':
         return <TestCasesView switchView={this.switchView} authenticated={this.state.authenticated} username={this.state.username}></TestCasesView>;
       case 'single':
-        return <SingleView></SingleView>
+        return <SingleView id = {this.state.id} switchView={this.switchView} authenticated={this.state.authenticated} username={this.state.username}></SingleView>
     }
   }
 
@@ -101,10 +104,38 @@ class SingleView extends React.Component {
     super(props);
     this.state = {
       id: this.props.id,
+      ownername : "",
+      content : "",
       toggle: false
     }
     this.toggleChange = this.toggleChange.bind(this);
     this.deleteTestCase = this.deleteTestCase.bind(this);
+    this.backToCases = this.backToCases.bind(this);
+  }
+
+  componentDidMount(){
+    let body = {
+      id: this.state.id
+    };
+    fetch("http://localhost:3001/tests/single", {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify(body)
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          let fetched = data.testcase[0];
+          this.setState({
+            ownername : data.testcase[0].ownername,
+            content : data.testcase[0].content
+          });
+        }
+      })
+      .catch(error => console.error(error));
   }
 
   toggleChange() {
@@ -140,13 +171,13 @@ class SingleView extends React.Component {
       })
   }
 
+  backToCases(){
+    
+  }
+
   render() {
     return (
       <div>
-        {this.state.deleted ?
-        <div>
-        </div>
-        :
         <div>{!this.state.toggle ?
           <button type="button" className="testcase" onClick={this.toggleChange}>
             {this.state.content}
@@ -158,14 +189,14 @@ class SingleView extends React.Component {
             </button>
             <div className="testcase-detail">
               Submitted by {this.state.ownername}.
-              {this.props.currentUser === this.state.ownername ?
+              {this.props.username === this.state.ownername ?
                 <button onClick={this.deleteTestCase}>Delete TestCase</button>
                 : <p>nope</p>}
             </div>
           </div>
         }
+        <button onClick = {() => this.props.switchView('testcases', 0)}>Back</button>
         </div>
-        }
       </div>
     );
   }

@@ -57,9 +57,19 @@ router.get("/fetch", (req, res) => {
     });
 });
 
+router.post("/single", (req, res) => {
+    var id = req.body.id;
+    connection.query('SELECT * FROM testcases WHERE id = ?', [id], (err, result) => {
+        if (err) throw err;
+        res.json({
+            testcase: result,
+            success: true
+        })
+    })
+});
+
 router.post("/delete", (req, res) =>{
     var id = req.body.id;
-    console.log("id received : " + id);
     connection.query('DELETE FROM testcases WHERE id = ?', [id], (err, results) =>{
         if (err) throw err;
         res.json({
