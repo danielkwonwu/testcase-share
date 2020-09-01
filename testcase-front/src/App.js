@@ -69,7 +69,7 @@ class View extends React.Component {
 
   switchView(mode, id){
     switch(mode){
-      case 'testcases':
+      default:
         this.setState({
           mode : mode
         });
@@ -80,17 +80,15 @@ class View extends React.Component {
           id : id
         })
         break;
-      default:
-        break;
     }
   }
   
   getView(){
     switch(this.state.mode){
-      case 'testcases':
-        return <TestCasesView switchView={this.switchView} authenticated={this.state.authenticated} username={this.state.username}></TestCasesView>;
+      default:
+        return <TestCasesView switchView={this.switchView} authenticated={this.props.authenticated} username={this.props.username}></TestCasesView>;
       case 'single':
-        return <SingleView id = {this.state.id} switchView={this.switchView} authenticated={this.state.authenticated} username={this.state.username}></SingleView>
+        return <SingleView id = {this.state.id} switchView={this.switchView} authenticated={this.props.authenticated} username={this.props.username}></SingleView>
     }
   }
 
@@ -110,7 +108,6 @@ class SingleView extends React.Component {
     }
     this.toggleChange = this.toggleChange.bind(this);
     this.deleteTestCase = this.deleteTestCase.bind(this);
-    this.backToCases = this.backToCases.bind(this);
   }
 
   componentDidMount(){
@@ -130,8 +127,8 @@ class SingleView extends React.Component {
         if (data.success) {
           let fetched = data.testcase[0];
           this.setState({
-            ownername : data.testcase[0].ownername,
-            content : data.testcase[0].content
+            ownername : fetched.ownername,
+            content : fetched.content
           });
         }
       })
@@ -139,18 +136,19 @@ class SingleView extends React.Component {
   }
 
   toggleChange() {
-    console.log("toggle fired");
     var tog = this.state.toggle;
     this.setState({
       toggle: !tog
     });
   };
 
-  deleteTestCase(event) {
+  deleteTestCase() {
     console.log("delete fired : " + this.state.id);
     let body = {
       id: this.state.id
     }
+    
+    if (!window.confirm("delete?")) return;
     fetch("http://localhost:3001/tests/delete", {
       credentials: 'include',
       headers: {
@@ -163,16 +161,12 @@ class SingleView extends React.Component {
       .then(data => {
         if (data.success) {
           console.log("sucess deleting");
-          this.props.refresh();
+          this.props.switchView('testcases', 0);
         }
         else {
           console.log("error while deleting");
         }
       })
-  }
-
-  backToCases(){
-    
   }
 
   render() {
@@ -190,13 +184,13 @@ class SingleView extends React.Component {
             <div className="testcase-detail">
               Submitted by {this.state.ownername}.
               {this.props.username === this.state.ownername ?
-                <button onClick={this.deleteTestCase}>Delete TestCase</button>
-                : <p>nope</p>}
+                <button onClick={() => this.deleteTestCase()}>Delete TestCase</button>
+                :<br></br>}
             </div>
           </div>
         }
-        <button onClick = {() => this.props.switchView('testcases', 0)}>Back</button>
         </div>
+        <button onClick = {() => this.props.switchView('testcases', 0)}>Back to TestCases</button>
       </div>
     );
   }
@@ -212,8 +206,6 @@ class TestCasesView extends React.Component {
     this.requestPost = this.requestPost.bind(this);
     this.changeText = this.changeText.bind(this);
     this.refreshTestCases = this.refreshTestCases.bind(this);
-    this.handleDelete = this.handleDelete.bind(this);
-    this.toggle = this.toggle.bind(this);
   }
 
   changeText(event) {
@@ -238,7 +230,6 @@ class TestCasesView extends React.Component {
           this.setState({
             fetchedTest: data.fetchedTest
           });
-          console.log("fetchData Success " + data.fetchedTest);
         }
       })
       .catch(error => console.error(error));
@@ -272,41 +263,8 @@ class TestCasesView extends React.Component {
     event.preventDefault();
   };
 
-  toggle(obj, key){
-    console.log("clicked " + obj.id + " " + obj.toggle);
-    var flag = obj.toggle;
-    obj.toggle = !flag;
-    document.getElementById(obj.id).text = obj.ownername;
-  }
-
-  handleDelete(id, key){
-    console.log("delete fired : " + id);
-    let body = {
-      id: id
-    }
-    fetch("http://localhost:3001/tests/delete", {
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: "POST",
-      body: JSON.stringify(body)
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          console.log("sucess deleting");
-          this.refreshTestCases();
-        }
-        else {
-          console.log("error while deleting");
-        }
-      })
-  }
-
   render() {
     const items = this.state.fetchedTest.map(obj =>{
-      obj.toggle = false;
       return(
           <div key = {obj.key}>
             <button type="button" className="testcase" onClick={() => this.props.switchView('single', obj.id)}>
@@ -359,7 +317,6 @@ class App extends React.Component {
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         if (data.success) {
           this.setState({
             authenticated: true,
@@ -461,6 +418,7 @@ class App extends React.Component {
       <div className="page-wrapper">
         <LoginBar authenticated={this.state.authenticated} error={this.state.loginError} username={this.state.username} logout={this.logout} login={this.login} register={this.register} ></LoginBar>
         <h1>TestCase Generator</h1>
+        <div>Click on each line to see details.</div>
         <View authenticated={this.state.authenticated} username={this.state.username} ></View>
       </div>
     )
